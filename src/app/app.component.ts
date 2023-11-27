@@ -1,8 +1,9 @@
-import { Component, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CesiumService } from './services/secium';
 import { FormsModule } from '@angular/forms';
-import * as Cesium from "cesium";
+// import * as Cesium from "cesium";
+import { Cartesian3, HeadingPitchRoll, Matrix4, Cesium3DTileStyle } from "cesium";
 
 @Component({
   selector: 'app-root',
@@ -29,11 +30,9 @@ export class AppComponent {
     { name: "Hide by Height", id: "4" },
   ];
 
-  constructor(private cesiumService: CesiumService, private cdr: ChangeDetectorRef) { }
+  constructor(private cesiumService: CesiumService) { }
 
-  ngOnInit(): void { }
-
-  ngAfterViewInit() {
+  ngOnInit(): void {
     this.cesiumService.loadTerrain(this.appSecium.nativeElement).then((res: any) => {
       if (res) {
         this.viewer = res;
@@ -47,13 +46,13 @@ export class AppComponent {
   }
 
   private setPosition() {
-    const initialPosition = Cesium.Cartesian3.fromDegrees(
+    const initialPosition = Cartesian3.fromDegrees(
       -74.01881302800248,
       40.69114333714821,
       753
     );
 
-    const initialOrientation = Cesium.HeadingPitchRoll.fromDegrees(
+    const initialOrientation = HeadingPitchRoll.fromDegrees(
       21.27879878293835,
       -21.34390550872461,
       0.0716951918898415
@@ -62,7 +61,7 @@ export class AppComponent {
     this.viewer.camera.flyTo({
       destination: initialPosition,
       orientation: initialOrientation,
-      endTransform: Cesium.Matrix4.IDENTITY
+      endTransform: Matrix4.IDENTITY
     })
   }
 
@@ -98,7 +97,7 @@ export class AppComponent {
   }
 
   colorByHeight() {
-    this.tileset.style = new Cesium.Cesium3DTileStyle({
+    this.tileset.style = new Cesium3DTileStyle({
       color: {
         conditions: [
           ["${Height} >= 300", "rgba(45, 0, 75, 0.5)"],
@@ -115,7 +114,7 @@ export class AppComponent {
   }
 
   colorByLatitude() {
-    this.tileset.style = new Cesium.Cesium3DTileStyle({
+    this.tileset.style = new Cesium3DTileStyle({
       defines: {
         latitudeRadians: "radians(${Latitude})",
       },
@@ -134,7 +133,7 @@ export class AppComponent {
   }
 
   colorByDistance() {
-    this.tileset.style = new Cesium.Cesium3DTileStyle({
+    this.tileset.style = new Cesium3DTileStyle({
       defines: {
         distance:
           "distance(vec2(radians(${Longitude}), radians(${Latitude})), vec2(-1.291777521, 0.7105706624))",
@@ -161,7 +160,7 @@ export class AppComponent {
   }
 
   hideByHeight() {
-    this.tileset.style = new Cesium.Cesium3DTileStyle({
+    this.tileset.style = new Cesium3DTileStyle({
       show: "${Height} > 200",
     });
   }
